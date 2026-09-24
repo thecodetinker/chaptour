@@ -1,0 +1,3 @@
+# CI runs integration tests against real dependencies via Aspire
+
+Unit tests alone don't catch DB-specific behavior (constraints, migrations, query translation) — the gap where "passes locally, breaks against real SQL Server" lives. CI reuses the same Aspire orchestration already chosen for local dev (ADR-0006) to spin up real SQL Server and Azurite containers and run integration tests against them before deploy, rather than relying on mocks or unit tests alone. Costs more CI time per run than unit tests alone; the trade is deliberate given `/tdd` and `/code-review` are the main quality gates in this workflow, and continuous deployment (ADR-0010) has no manual gate behind them.

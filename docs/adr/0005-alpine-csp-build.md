@@ -1,0 +1,3 @@
+# Alpine.js (CSP build) for client-side interactivity, under a strict CSP
+
+Razor Pages/MVC covers rendering; a small amount of client-side interactivity (form behaviour, small UI touches) still needs something lighter than a full SPA framework. We're using Alpine.js, specifically its CSP-friendly build, because the site runs under a strict Content-Security-Policy (no `unsafe-eval`) — the default Alpine build relies on `eval`-like expression evaluation and would force weakening the CSP to work. Don't swap in the standard Alpine build or another library that assumes a relaxed CSP without revisiting this.

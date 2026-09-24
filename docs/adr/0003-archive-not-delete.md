@@ -1,0 +1,3 @@
+# Ephemeral Updates are archived, never deleted
+
+Announcements and Tour Dates are time-bound: they shouldn't clutter an Author's main profile once stale (nobody wants to see an 18-month-old announcement presented as current). The alternative to what we chose was outright deletion after the visibility window. We chose to archive instead — move the Update to a Past Updates list rather than erase it — because deleting Follower-visible history is a footgun (an Author references "as I announced last month" and a Follower finds nothing) and because old links and announcements stay independently discoverable. The visibility window is 90 days, measured from the post date for an Announcement and from the event date for a Tour Date, for v1.

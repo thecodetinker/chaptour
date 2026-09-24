@@ -1,0 +1,3 @@
+# GitHub Actions authenticates to Azure via OIDC, not a stored secret
+
+The common default (and what Visual Studio's "Publish to Azure" wizard sets up) is a Service Principal with a stored client secret or publish profile in GitHub secrets — a long-lived credential that has to be rotated and is a real liability if it ever leaks. We're using OIDC federated credentials instead: GitHub issues a short-lived token per workflow run, nothing long-lived is stored anywhere. Slightly more setup (configuring the federated credential on the app registration) for a permanent security win, not an ongoing trade-off.
