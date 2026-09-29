@@ -4,6 +4,8 @@ How the engineering skills should consume this repo's domain documentation when 
 
 This repo's domain model borrows Eric Evans' Domain-Driven Design vocabulary: `CONTEXT.md` holds the **ubiquitous language** (the precise, agreed vocabulary for the domain — see "Use the glossary's vocabulary" below), and `CONTEXT-MAP.md` + per-context `CONTEXT.md` files (see "File structure") model **bounded contexts** — the boundaries within which a given vocabulary holds. This "Context" is a DDD term, not a C4 one: it's about where a *vocabulary* applies, not about what a *system* talks to. If this repo ever adopts C4 diagrams (system/container/component views — see `docs/agents/architecture.md` if it exists), note that C4's "System Context diagram" uses the same word for something different: the system and its external actors/dependencies, not a vocabulary boundary. Don't conflate the two — a domain's bounded Context and a C4 System Context diagram can disagree about where their boundaries are drawn, and that's fine; they're answering different questions.
 
+Nor does "Context" here ever mean an agent's **context window** (session memory, `/compact`, `/clear`). `CONTEXT.md` is the project's durable glossary, not a place to stash session notes or working state.
+
 ## Before exploring, read these
 
 - **`CONTEXT.md`** at the repo root, or
