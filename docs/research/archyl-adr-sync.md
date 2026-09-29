@@ -154,6 +154,21 @@ Optionally, add `.github/dependabot.yml` with `package-ecosystem: github-actions
 4. **API key scope.** Keys are user-wide read-write. Create a dedicated key with a 90-day expiry, and decide whether ADR-0013 needs an explicit note or ADR recording this exception.
 5. **Store the project UUID as the Actions variable `ARCHYL_PROJECT_ID`** (Archyl's own convention), in addition to the `ARCHYL_API_KEY` secret.
 6. **Run the Node 24 check** on the first run. If the `node20` action misbehaves, switch to the documented `curl` call.
+7. **Does `/dsl/ingest` count against the free plan's AI-import quota?** See "Free-plan AI-import quota" below. Watch the plan's usage display before and after the first `workflow_dispatch` run, or ask Archyl.
+
+## Free-plan AI-import quota (observed during the issue #2 trial)
+
+Observed on 2026-09-29 while running the manual trial in [thecodetinker/chaptour#2](https://github.com/thecodetinker/chaptour/issues/2):
+
+- **The free plan allows 3 "Import using AI" runs per month.** The trial used 2, leaving 1 for the rest of the month.
+- **ADR Discovery worked.** All 15 ADRs came through, each tagged "Discovered" in the Decisions view, with titles matching the H1s.
+- **The AI assigned statuses the ADRs don't contain.** 13 came through as Accepted and 2 as Proposed (one of them 0015). None of the `docs/adr/` files states a status, so the AI inferred these. That is the behaviour issue #2 asked the trial to check.
+
+What this means for automated sync:
+
+- **ADR Discovery is the quota-limited path.** The CI sync takes a different route: the Action posts `archyl.yaml` text to `/dsl/ingest` with an API key (see "What the sync action actually does"). That is YAML parsing, not an AI call, so it probably doesn't count against the quota. This is inference and **unverified**. Archyl doesn't document whether ingest has its own free-plan limits.
+- **`adrs.folder` is the risk.** If ingest resolves a folder by fetching and parsing `docs/adr/*` server-side (open question 1), that parsing could count as an AI import. The Stage 2 inline-`records` approach avoids any server-side discovery, so it can't use the quota.
+- **Don't re-run AI import over the existing records.** The matching key for existing ADRs is undocumented (open question 3), so a second import could duplicate all 15 and would also spend the last run of the month. Keep the remaining run as a fallback in case the CI sync fails.
 
 ## Mismatches between issue #2 and reality
 
