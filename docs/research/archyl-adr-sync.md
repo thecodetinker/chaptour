@@ -71,7 +71,7 @@ The same GitHub Actions page recommends storing the project UUID as an Actions *
 ## Chaptour repo facts and ADR tensions
 
 - **No `.github/` directory exists** (`ls -a` at repo root: `.git`, `.gitignore`, `AGENTS.md`, `CONTEXT.md`, `docs`). There is no "CI pipeline" to add a step to. The sync would be the repo's **first** workflow file, so it would also be the first thing to exercise ADR-0009 (GitHub Actions for CI/CD).
-- **The default branch is `master`** (`gh repo view --json defaultBranchRef` → `master`), not `main` as the issue and all Archyl examples use. A copy-pasted `branches: [main]` would never fire. The repo is **public**, which matters for the trigger choice below.
+- **The default branch was `master`** when this was written, not `main` as the issue and all Archyl examples use. It was renamed to `main` on 2026-09-29, so `branches: [main]` is now correct. The repo is **public**, which matters for the trigger choice below.
 - **ADR-0013 (OIDC, no stored secrets).** This is a direct tension. ADR-0013 rejects long-lived stored credentials "a real liability if it ever leaks", and `ARCHYL_API_KEY` is exactly that kind of credential, user-wide and read-write. The ADR's wording scopes it to *Azure* auth ("GitHub Actions authenticates to Azure via OIDC"), so this is not a literal violation. It is worth a line in the eventual PR, or a short ADR, that records the exception and its mitigations: key expiry, a dedicated key, and the secret exposed only to one job and one step.
 - **ADR-0014 (trunk-based, every commit on main shippable)** makes `on: push` to the trunk the natural trigger, and there are no long-lived branches to sync from. The sync has no bearing on shippability. It should not be made a required status check, so an Archyl outage cannot block the trunk.
 - **ADR-0015 (automated dependency scanning).** GitHub says "Pinning an action to a full-length commit SHA is currently the only way to use an action as an immutable release" ([Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)). A third-party action that receives a write-scoped key is exactly the case pinning is for, because a moved `v1` tag could exfiltrate the key. Pinning by SHA does stop automatic pickup of fixes, so pair it with Dependabot's `github-actions` ecosystem, which "checks for new versions of your actions" weekly and raises PRs ([Dependabot for actions](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/auto-update-actions)). ADR-0015 already commits to Dependabot, but there is no `.github/dependabot.yml` yet. I did not confirm from that page that Dependabot rewrites SHA pins, as opposed to tag pins. GitHub's docs are widely understood to support it when a `# vX.Y.Z` comment follows the SHA, but I'm flagging it as not verified here.
@@ -108,7 +108,7 @@ name: Archyl sync
 
 on:
   push:
-    branches: [master]          # issue says main; repo default is master
+    branches: [main]
     paths:
       - archyl.yaml
       - docs/adr/**
@@ -157,7 +157,7 @@ Optionally, add `.github/dependabot.yml` with `package-ecosystem: github-actions
 
 ## Mismatches between issue #2 and reality
 
-- The issue says `main`. The repo's default branch is **`master`**.
+- The issue says `main`. The repo's default branch was **`master`** (renamed to `main` on 2026-09-29).
 - The issue says "Add … to the CI pipeline". **There is no CI pipeline**, no `.github/` at all. This would be the first workflow.
 - The issue says "`adrs` section can point at an existing ADR folder rather than duplicating records inline". The schema allows `folder`, but **Archyl does not document that it works through `/dsl/ingest`**, and the sync action demonstrably uploads only the YAML text.
 - The issue says "evaluated in `docs/research/architecture-documentation-options.md`". **That file never mentions Archyl.** It evaluates arc42, C4, Google design docs and Nygard ADRs, and recommends C4 diagrams informally (e.g. Mermaid) rather than a platform. The Archyl decision has no research note or ADR behind it yet.
